@@ -162,10 +162,10 @@
     </div>
     <div class="navigation">
         <div class="nav-cent">
-            <div class="logo"><a href="index.html"><img src="images/logo.png" width="240"/></a></div>
-            <div class="city"><span id="DY_site_name" class="red city-name Left">合肥</span>
-                <div id="JS_hide_city_menu_11" class="city-select cut_handdler Left"><a href="javascript:void(0);"
-                                                                                        class="common-bg selector">切换城市</a>
+            <div class="logo"><a href="index.html"><img src="images/logo.png" width="200"/></a></div>
+            <div class="city"><span id="DY_site_name" class="red city-name Left">上海</span>
+                <div id="JS_hide_city_menu_11" class="city-select cut_handdler Left">
+                    <a href="javascript:void(0);" class="common-bg selector">切换城市</a>
                     <div id="JS_header_city_bar_box" class="hide_city_group">
                         <div class="hideMap">
                             <div class="showPanel clearfix">
@@ -202,8 +202,8 @@
         </div>
     </div>
     <ul class="navmenu">
-        <li class="active"><a href="index.html">首页</a><span></span></li>
-        <li><a href="list.html">我要买车</a><span></span></li>
+        <li><a href="index.html">首页</a><span></span></li>
+        <li class="active"><a href="list.html">我要买车</a><span></span></li>
         <li><a href="wymc.html">我要卖车</a><span></span></li>
         <li><a href="#">汽车保险</a><span></span></li>
         <li><a href="#">汽车百科</a><span></span></li>
@@ -230,7 +230,10 @@
     </div>
     <div class="clear_fix"></div>
     <!--所在位置-->
-    <div class="crumbp"><a href="#">首页</a> <em>&gt;</em> <span>个人二手车</span></div>
+    <div class="crumbp">
+        <a href="index.html">首页</a>
+        <em>&gt;</em> <span>车行</span>
+    </div>
     <div class="mainbox">
         <!--搜索条件-->
         <div class="comfilter-bd">
@@ -238,27 +241,27 @@
                 <dl class="fliter-bd clearfix">
                     <dt>品牌：</dt>
                     <dd class="clickBrandWidget">
-                        <a class="on" href="#" @click="search"> 不限 </a>
-                        <a class="" href="#" title="奥迪"> 奥迪 </a>
+                        <a class="on" href="list.html"> 不限 </a>
+                        <a class="" href="#" title="奥迪" @click="searchByBrand(77)"> 奥迪 </a>
                         <a class="" href="#" title="阿斯顿马丁"> 阿斯顿马丁 </a>
                         <a class="" href="#" title="阿尔法罗密欧"> 阿尔法罗密欧 </a>
-                        <a class="" href="#" title="奔驰"> 奔驰 </a>
-                        <a class="" href="#" title="宝马"> 宝马 </a>
-                        <a class="" href="#" title="保时捷"> 保时捷 </a>
-                        <a class="" href="#" title="布加迪威龙"> 布加迪 </a>
+                        <a class="" href="#" title="奔驰" @click="searchByBrand(75)"> 奔驰 </a>
+                        <a class="" href="#" title="宝马" @click="searchByBrand(24)"> 宝马 </a>
+                        <a class="" href="#" title="保时捷" @click="searchByBrand(33)"> 保时捷 </a>
+                        <a class="" href="#" title="布加迪威龙" @click="searchByBrand(40)"> 布加迪 </a>
                         <a class="" href="#" title="大众"> 大众 </a>
-                        <a class="" href="#" title="道奇"> 道奇 </a>
+                        <a class="" href="#" title="道奇" @click="searchByBrand(79)"> 道奇 </a>
                         <a class="" href="#" title="丰田"> 丰田 </a>
                         <a class="" href="#" title="福特"> 福特 </a>
-                        <a class="" href="#" title="法拉利"> 法拉利 </a>
+                        <a class="" href="#" title="法拉利" @click="searchByBrand(27)"> 法拉利 </a>
                         <a class="" href="#" title="捷豹"> 捷豹 </a>
                         <a class="" href="#" title="科尼赛克"> 科尼赛克 </a>
                         <a class="" href="#" title="雷克萨斯"> 雷克萨斯 </a>
                         <a class="" href="#" title="劳斯莱斯"> 劳斯莱斯 </a>
-                        <a class="" href="#" title="兰博基尼"> 兰博基尼 </a>
+                        <a class="" href="#" title="兰博基尼" @click="searchByBrand(44)"> 兰博基尼 </a>
                         <a class="" href="#" title="路特斯"> 路特斯 </a>
-                        <a class="" href="#" title="玛莎拉蒂"> 玛莎拉蒂 </a>
-                        <a class="" href="#" title="迈凯轮"> 迈凯轮 </a>
+                        <a class="" href="#" title="玛莎拉蒂" @click="searchByBrand(30)"> 玛莎拉蒂 </a>
+                        <a class="" href="#" title="迈凯轮" @click="searchByBrand(38)"> 迈凯轮 </a>
                         <a class="" href="#" title="迈巴赫"> 迈巴赫 </a>
                         <a class="" href="#" title="帕加尼"> 帕加尼 </a>
                         <a class="" href="#" title="日产"> 日产 </a>
@@ -440,8 +443,8 @@
                 <dl class="fliter-bd clearfix">
                     <dt>车系：</dt>
                     <dd class="clickTagWidget">
-                        <a class="on" href="#" @click="search"> 不限 </a>
-                        <a class="" href="#" title="奥迪R8"> R8 </a>
+                        <a class="on" href="list.html"> 不限 </a>
+                        <a class="" href="#" title="奥迪R8" @click="searchByBrand(77)"> R8 </a>
                         <a class="" href="#" title="AMG GT R"> AMG GT R </a>
                         <a class="" href="#" title="M8"> M8 </a>
                         <a class="" href="#" title="GT3RS"> GT3RS </a>
@@ -486,7 +489,7 @@
                 </dl>
                 <dl class="fliter-bd clearfix">
                     <dt>车龄：</dt>
-                    <dd><a data-role="filterItemAge" data-value="" class="on" href="#"> 不限 </a>
+                    <dd><a data-role="filterItemAge" data-value="" class="on" href="#" @click="searchByCarAge(10000,0)"> 不限 </a>
                         <a class="" href="#" title="5年以上二手车" @click="searchByCarAge(5,1)"> 5年以上 </a>
                         <a class="" href="#" title="5年内二手车" @click="searchByCarAge(5,0)"> 5年内 </a>
                         <a class="" href="#" title="3年内二手车" @click="searchByCarAge(3,0)"> 3年内 </a>
@@ -975,6 +978,13 @@
 
         methods: {
 
+            //品牌筛选条件
+            searchByBrand(typeId){
+              this.query.typeId = typeId;
+                this.query.currentPage = 1;
+                this.getCarSearch();
+            },
+
             //车龄筛选条件
             searchByCarAge(carAge,carAgeType){
                 this.query.carAge = carAge;
@@ -1011,6 +1021,7 @@
 
             //搜索
             search() {
+                console.log(this.query);
                 //从第一页开始查
                 this.query.currentPage = 1;
                 //是否超值

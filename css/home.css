@@ -425,8 +425,8 @@ transition:1s ease;
 .pages a{display:inline-block;padding:8px 15px;border:1px solid #ddd;margin:0 5px;font-family:'宋体';font-size:13px;}
 .pages a:hover,.pages a.on{color:#fff;background:#00002e;border-color:#00002e;}
 
-/***所在位置***/
-.crumbp { width:1190px; margin:0 auto; padding-top:20px; line-height: 22px;}
+/***所在位置1190px***/
+.crumbp { width:1160px; margin:0 auto; padding-top:20px; line-height: 2px;}
 .crumbp, .crumbp a { color: #678fae;}
 .crumbp span { color: #666;}
 
