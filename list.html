@@ -242,6 +242,9 @@
                     <dt>品牌：</dt>
                     <dd class="clickBrandWidget">
                         <a class="on" href="list.html"> 不限 </a>
+                        <!--                        <span v-for="carType in pageInfo.rows">-->
+                        <!--                            <a class="" href="#" ></a>-->
+                        <!--                        </span>-->
                         <a class="" href="#" title="奥迪" @click="searchByBrand(77)"> 奥迪 </a>
                         <a class="" href="#" title="阿斯顿马丁"> 阿斯顿马丁 </a>
                         <a class="" href="#" title="阿尔法罗密欧"> 阿尔法罗密欧 </a>
@@ -477,11 +480,13 @@
                         <a class="" href="#" title="20万以上二手车" @click="searchByPrice(20,100000)"> 20万以上 </a>
                         <span class="input-box clearfix rangeFilter">
           <label>
-            <input type="text" value="" v-model="min" data-default-value="0" size="6" class="js-begin" maxlength="3" id="my_price_b" name="b">
+            <input type="text" value="" v-model="min" data-default-value="0" size="6" class="js-begin" maxlength="3"
+                   id="my_price_b" name="b">
           </label>
           <label><i class="input-line">～</i></label>
           <label>
-            <input type="text" value="" v-model="max" data-default-value="999" size="6" class="js-end" maxlength="3" id="my_price_e" name="e">
+            <input type="text" value="" v-model="max" data-default-value="999" size="6" class="js-end" maxlength="3"
+                   id="my_price_e" name="e">
           </label>
           <label class="input-unit">万</label>
           <label><a gjalog="" href="#" class="input-btn js-btn" @click="searchByPrice(min,max)">筛选</a></label>
@@ -489,7 +494,8 @@
                 </dl>
                 <dl class="fliter-bd clearfix">
                     <dt>车龄：</dt>
-                    <dd><a data-role="filterItemAge" data-value="" class="on" href="#" @click="searchByCarAge(10000,0)"> 不限 </a>
+                    <dd><a data-role="filterItemAge" data-value="" class="on" href="#" @click="searchByCarAge(10000,0)">
+                        不限 </a>
                         <a class="" href="#" title="5年以上二手车" @click="searchByCarAge(5,1)"> 5年以上 </a>
                         <a class="" href="#" title="5年内二手车" @click="searchByCarAge(5,0)"> 5年内 </a>
                         <a class="" href="#" title="3年内二手车" @click="searchByCarAge(3,0)"> 3年内 </a>
@@ -666,11 +672,11 @@
         <ul class="carList">
             <li v-for="car in pageInfo.rows">
                 <div class="list-infoBox">
-                    <a :title="car.title" target="_blank" class="imgtype" href="infor.html">
+                    <a :title="car.title" target="_blank" class="imgtype" :href="`cardetail/${car.id}.html`">
                         <img :src="car.cover" :alt="car.title" width="290" height="194"/>
                     </a>
                     <p class="infoBox">
-                        <a :title="car.title" href="infor.html" target="_blank" class="info-title">
+                        <a :title="car.title" :href="`cardetail/${car.id}.html`" target="_blank" class="info-title">
                             {{car.title}}
                         </a>
                     </p>
@@ -694,13 +700,6 @@
             <a v-if="page == query.currentPage" class="on" @click="changePageCount(page)">{{page}}</a>
             <a v-else href="30/p/1.html" @click="changePageCount(page)">{{page}}</a>
         </span>
-        <!--        <a class="on" href="30/p/1.html">1</a>-->
-        <!--        <a class="" href="30/p/2.html">2</a>-->
-        <!--        <a class="" href="30/p/3.html">3</a>-->
-        <!--        <a class="" href="30/p/4.html">4</a>-->
-        <!--        <a class="" href="30/p/5.html">5</a>-->
-        <!--        <a href="30/p/2.html">&gt;&gt;</a>-->
-        <!--        <a href="30/p/6.html">6</a>-->
     </div>
     <div class="clear_fix"></div>
 
@@ -792,15 +791,22 @@
                         <ul class="login-items">
                             <li class="clearfix">
                                 <input class="input" name="mobile" id="mobile" type="text" value=""
-                                       placeholder="手机号码（登录帐号）">
+                                       placeholder="Phone（Login account）">
                             </li>
                             <li class="clearfix">
-                                <input class="input left" type="text" value="" name="verify" placeholder="输入验证码"
+                                <input class="input left" type="text" value="" name="imgVerify"
+                                       placeholder="image verification"
+                                       style="width:100px;margin-right: 10px;"/>
+                                <img :src="img" @click="getImg"/>
+                            </li>
+                            <li class="clearfix">
+                                <input class="input left" type="text" value="" name="verify"
+                                       placeholder="verification code"
                                        style="width:100px;"/>
-                                <div id="send"><a href="#" class="send_code right">获取验证码</a></div>
+                                <div id="send"><a href="#" class="send_code right">Get code</a></div>
                             </li>
                             <li class="clearfix">
-                                <input class="input" type="text" value="" name="realname" placeholder="姓名">
+                                <input class="input" type="text" value="" name="realname" placeholder="username">
                             </li>
                             <li class="clearfix sex">
                                 <input type="radio" checked="" name="gender" value="M"/>
@@ -810,7 +816,7 @@
                             </li>
                             <li class="clearfix">
                                 <input id="" class="input" type="password" name="password" value=""
-                                       placeholder="输入密码（六位字符）">
+                                       placeholder="Enter the password（Six-bit character）">
                             </li>
                         </ul>
                         <div class="login-button">
@@ -973,20 +979,76 @@
                 totalPage: 0
             },
             min: null,
-            max: null
+            max: null,
+            vehicleType: [],      //装一级车辆类型
+
+            img: "",
+            imgCodePrefix: "data:image/jpeg;base64,"
+
         },
 
         methods: {
 
+            //创建uuid随机字符串
+            createUuid() {
+                var s = [];
+                var hexDigits = "0123456789abcdefghi";
+                for (var i = 0; i < 36; i++) {
+                    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+                }
+                s[14] = "4";
+                s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+                s[8] = s[13] = s[18] = s[23] = "-";
+
+                var uuid = s.join("");
+                return uuid;
+            },
+
+            //获取图片验证码
+            getImg() {
+                let imageCodeKey = sessionStorage.getItem("registerImageCodeKey");
+                if (!imageCodeKey || imageCodeKey === '') {
+                    imageCodeKey = this.createUuid(); // 重新生成uuid
+                    sessionStorage.setItem("registerImageCodeKey", imageCodeKey);
+                }
+                // 调用后端接口获取图片验证码
+                this.$http.get("/verification/image/" + imageCodeKey)
+                    .then( result => {
+                        result = result.data;
+                        if (result.success) {
+                            this.img = this.imgCodePrefix + result.resultObj;
+                        }else {
+
+                        }
+                    }).catch( result => {
+
+                })
+            },
+
+            //获取一级车辆类型
+            getVehicleType() {
+                this.$http.post("/carSearch", this.query)
+                    .then(result => {
+                        result = result.data;
+                        if (result.success) {
+                            this.vehicleType = result.resultObj;
+                        } else {
+
+                        }
+                    }).catch(result => {
+
+                })
+            },
+
             //品牌筛选条件
-            searchByBrand(typeId){
-              this.query.typeId = typeId;
+            searchByBrand(typeId) {
+                this.query.typeId = typeId;
                 this.query.currentPage = 1;
                 this.getCarSearch();
             },
 
             //车龄筛选条件
-            searchByCarAge(carAge,carAgeType){
+            searchByCarAge(carAge, carAgeType) {
                 this.query.carAge = carAge;
                 this.query.carAgeType = carAgeType;
                 this.query.currentPage = 1;
@@ -1021,7 +1083,6 @@
 
             //搜索
             search() {
-                console.log(this.query);
                 //从第一页开始查
                 this.query.currentPage = 1;
                 //是否超值
@@ -1079,9 +1140,9 @@
             //获取url上的参数
             var url = location.href;
             var param = url.split("?")[1];
-            if (param){
+            if (param) {
                 var params = param.split("&");
-                for (i = 0; i < params.length; i++){
+                for (i = 0; i < params.length; i++) {
                     var para = params[i];
                     var key = para.split("=")[0];
                     var value = para.split("=")[1];
@@ -1089,6 +1150,7 @@
                 }
             }
             this.getCarSearch();
+            this.getImg();
         }
 
     })
