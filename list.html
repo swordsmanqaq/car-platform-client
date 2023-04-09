@@ -155,7 +155,8 @@
 
     <div class="egc-top">
         <div class="nav-cent">
-            <div class="top-r"><a href="#" id="b-regist">注册</a>|<a href="#" id="b-login" class="b-login">登陆</a></div>
+            <div class="top-r"><a href="javascript:void(0)" id="b-regist">注册</a>|<a href="#" id="b-login"
+                                                                                    class="b-login">登陆</a></div>
             <div class="top-l">全国统一客服热线：XXX</div>
             <div class="clear_fix"></div>
         </div>
@@ -790,39 +791,36 @@
                           name="reg" id="reg">
                         <ul class="login-items">
                             <li class="clearfix">
-                                <input class="input" name="mobile" id="mobile" type="text" value=""
-                                       placeholder="Phone（Login account）">
+                                <input class="input" name="mobile" id="mobile" :maxlength="11" v-model="sendMessage.phone" type="text" value="" placeholder="Phone（Login account）">
                             </li>
                             <li class="clearfix">
-                                <input class="input left" type="text" value="" name="imgVerify"
-                                       placeholder="image verification"
+                                <input class="input left" type="text" v-model="sendMessage.imageCode" value="" name="imgVerify" placeholder="image verification"
                                        style="width:100px;margin-right: 10px;"/>
                                 <img :src="img" @click="getImg"/>
                             </li>
                             <li class="clearfix">
-                                <input class="input left" type="text" value="" name="verify"
-                                       placeholder="verification code"
+                                <input class="input left" type="text" v-model="sendMessage.smsCode" value="" name="verify" placeholder="verification code"
                                        style="width:100px;"/>
-                                <div id="send"><a href="#" class="send_code right">Get code</a></div>
+                                <div id="send"><a href="javascript:void(0)" @click="sendMessageCode($event)" class="send_code right">Get code</a></div>
                             </li>
                             <li class="clearfix">
-                                <input class="input" type="text" value="" name="realname" placeholder="username">
-                            </li>
-                            <li class="clearfix sex">
-                                <input type="radio" checked="" name="gender" value="M"/>
-                                男&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input type="radio" name="gender" value="F"/>
-                                女
+                                <input class="input" type="text" v-model="sendMessage.username" value="" name="realname" placeholder="username">
                             </li>
                             <li class="clearfix">
-                                <input id="" class="input" type="password" name="password" value=""
-                                       placeholder="Enter the password（Six-bit character）">
+                                <input class="input" type="text" value="" v-model="sendMessage.email"  name="email" placeholder="Email">
+                            </li>
+                            <li class="clearfix">
+                                <input id="" class="input" type="password" v-model="sendMessage.password" name="password" value=""
+                                       placeholder="Enter the password(Six-bit character)">
+                            </li>
+                            <li class="clearfix">
+                                <input class="input" type="password" v-model="sendMessage.confirmPassword" name="confirmPassword" value="" placeholder="Confirm password(Six-bit character)">
                             </li>
                         </ul>
                         <div class="login-button">
                             <input type="hidden" value="" name="carid" class="ordercarid"/>
                             <input type="hidden" value="" name="carstatus" class="orderstatus"/>
-                            <input type="button" value="立即注册" class="fM" onclick="$('#reg').submit()"/>
+                            <input type="button" value="立即注册" class="fM" @click="registerSave"/>
                         </div>
                     </form>
                 </div>
@@ -983,7 +981,16 @@
             vehicleType: [],      //装一级车辆类型
 
             img: "",
-            imgCodePrefix: "data:image/jpeg;base64,"
+            imgCodePrefix: "data:image/jpeg;base64,",
+            sendMessage: {
+                phone: "",
+                imageCode: "",
+                smsCode: "", // 手机验证码
+                username: "",
+                email: "",
+                password: "",
+                confirmPassword: ""
+            }
 
         },
 
@@ -1013,16 +1020,100 @@
                 }
                 // 调用后端接口获取图片验证码
                 this.$http.get("/verification/image/" + imageCodeKey)
-                    .then( result => {
+                    .then(result => {
                         result = result.data;
                         if (result.success) {
                             this.img = this.imgCodePrefix + result.resultObj;
-                        }else {
+                        } else {
 
                         }
-                    }).catch( result => {
+                    }).catch(result => {
 
                 })
+            },
+
+            //发送手机验证码
+            sendMessageCode(event) {
+                //1.判断手机号不为空
+                if (!this.sendMessage.phone) {
+                    alert("手机号不能为空");
+                    return;
+                }
+                //2.判断图片验证码不为空
+                if (!this.sendMessage.imageCode) {
+                    alert("图片验证码不能为空");
+                    return;
+                }
+
+                //3.获取按钮，禁用按钮
+                var sendBtn = $(event.target);
+                sendBtn.attr("disabled", true);
+
+                //获取uuid
+                this.sendMessage.imageCodeKey = sessionStorage.getItem("registerImageCodeKey");
+
+
+                //4.发送ajax请求
+                this.$http.post("/verification/sms/register", this.sendMessage)
+                    .then(result => {
+                        var ajaxResult = result.data;
+                        if (ajaxResult.success) {
+                            alert("手机验证码已经发送到您的手机，请在1分钟内使用");
+                            //4.1.发送成：倒计时
+                            var time = 60;
+
+                            var interval = window.setInterval(function () {
+                                //每一条倒计时减一
+                                time = time - 1;
+
+                                //把倒计时时间搞到按钮上
+                                sendBtn.val(time + "秒后重发");
+
+                                //4.2.倒计时完成恢复按钮
+                                if (time <= 0) {
+                                    sendBtn.val("重新发送");
+                                    sendBtn.attr("disabled", false);
+                                    //清除定时器
+                                    window.clearInterval(interval);
+                                }
+                            }, 1000);
+                        } else {
+                            //4.3.发送失败：提示，恢复按钮
+                            sendBtn.attr("disabled", false);
+                            alert("发送失败:" + ajaxResult.message);
+                        }
+                    })
+            },
+
+            //注册方法
+            registerSave() {
+                //判断手机号不能为空
+                if (!this.sendMessage.phone) {
+                    alert("手机号不能为空");
+                    return;
+                }
+                //判断图片验证码不能为空
+                if (!this.sendMessage.smsCode) {
+                    alert("手机验证码不能为空");
+                    return;
+                }
+                //比较两次密码是否一致
+                if (this.sendMessage.password != this.sendMessage.confirmPassword){
+                    alert("两次密码不一致，请重新输入");
+                    return;
+                }
+
+                //调用后端注册接口
+                this.$http.post("/user/phone/register", this.sendMessage)
+                    .then(result => {
+                        result = result.data;
+                        if (result.success) {
+                            alert("恭喜你,注册成功!");
+                            $('#popBox').fadeOut(); // 关闭注册弹框
+                        } else {
+                            alert(result.message);
+                        }
+                    })
             },
 
             //获取一级车辆类型
