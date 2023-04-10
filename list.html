@@ -155,8 +155,16 @@
 
     <div class="egc-top">
         <div class="nav-cent">
-            <div class="top-r"><a href="javascript:void(0)" id="b-regist">注册</a>|<a href="#" id="b-login"
-                                                                                    class="b-login">登陆</a></div>
+            <div class="top-r">
+                <span id="loginBefore">
+                    <a href="javascript:void(0)" id="b-regist">注册</a>|
+                    <a href="#" id="b-login" class="b-login">登陆</a>
+                </span>
+                <span id="loginAfter" style="display: none;">
+                    欢迎您：{{username}}！
+                    <a href="#" id="b-logout" class="b-login">登出</a>
+                </span>
+            </div>
             <div class="top-l">全国统一客服热线：XXX</div>
             <div class="clear_fix"></div>
         </div>
@@ -765,13 +773,15 @@
                     <form onsubmit="return check();" enctype="multipart/form-data" method="post" name="form" id="form">
                         <ul class="login-items">
                             <li>
-                                <label>用户名(手机号)</label>
+                                <label>用户名</label>
                                 <input class="input" type="text" value="" maxlength="32" name="username"
-                                       placeholder="请输入您的手机号">
+                                       v-model="loginDto.username"
+                                       placeholder="请输入用户名(账号/手机号/邮箱)">
                             </li>
                             <li>
                                 <label>密码</label>
-                                <input class="input" type="password" value="" maxlength="16" name="password">
+                                <input class="input" type="password" value="" maxlength="16" name="password"
+                                       v-model="loginDto.password" placeholder="请输入密码">
                             </li>
                         </ul>
                         <div class="login-check">
@@ -781,8 +791,7 @@
                         <div class="login-button">
                             <input type="hidden" value="" name="carid" class="ordercarid"/>
                             <input type="hidden" value="" name="carstatus" class="orderstatus"/>
-                            <input type="button" value="登&nbsp;&nbsp;&nbsp;&nbsp;陆" class="fM"
-                                   onclick="$('#form').submit()"/>
+                            <input type="button" value="登陆" class="fM" @click="loginIn"/>
                         </div>
                     </form>
                 </div>
@@ -791,30 +800,40 @@
                           name="reg" id="reg">
                         <ul class="login-items">
                             <li class="clearfix">
-                                <input class="input" name="mobile" id="mobile" :maxlength="11" v-model="sendMessage.phone" type="text" value="" placeholder="Phone（Login account）">
+                                <input class="input" name="mobile" id="phone" :maxlength="11"
+                                       v-model="sendMessage.phone" type="text" value=""
+                                       placeholder="Phone（Login account）">
                             </li>
                             <li class="clearfix">
-                                <input class="input left" type="text" v-model="sendMessage.imageCode" value="" name="imgVerify" placeholder="image verification"
+                                <input class="input left" type="text" v-model="sendMessage.imageCode" value=""
+                                       name="imgVerify" placeholder="image verification"
                                        style="width:100px;margin-right: 10px;"/>
                                 <img :src="img" @click="getImg"/>
                             </li>
                             <li class="clearfix">
-                                <input class="input left" type="text" v-model="sendMessage.smsCode" value="" name="verify" placeholder="verification code"
+                                <input class="input left" type="text" v-model="sendMessage.smsCode" value=""
+                                       name="verify" placeholder="verification code"
                                        style="width:100px;"/>
-                                <div id="send"><a href="javascript:void(0)" @click="sendMessageCode($event)" class="send_code right">Get code</a></div>
+                                <div id="send"><a href="javascript:void(0)" @click="sendMessageCode($event)"
+                                                  class="send_code right">Get code</a></div>
                             </li>
                             <li class="clearfix">
-                                <input class="input" type="text" v-model="sendMessage.username" value="" name="realname" placeholder="username">
+                                <input class="input" type="text" v-model="sendMessage.username" value="" name="realname"
+                                       placeholder="username">
                             </li>
                             <li class="clearfix">
-                                <input class="input" type="text" value="" v-model="sendMessage.email"  name="email" placeholder="Email">
+                                <input class="input" type="text" value="" v-model="sendMessage.email" name="email"
+                                       placeholder="Email">
                             </li>
                             <li class="clearfix">
-                                <input id="" class="input" type="password" v-model="sendMessage.password" name="password" value=""
+                                <input id="" class="input" type="password" v-model="sendMessage.password"
+                                       name="password" value=""
                                        placeholder="Enter the password(Six-bit character)">
                             </li>
                             <li class="clearfix">
-                                <input class="input" type="password" v-model="sendMessage.confirmPassword" name="confirmPassword" value="" placeholder="Confirm password(Six-bit character)">
+                                <input class="input" type="password" v-model="sendMessage.confirmPassword"
+                                       name="confirmPassword" value=""
+                                       placeholder="Confirm password(Six-bit character)">
                             </li>
                         </ul>
                         <div class="login-button">
@@ -990,11 +1009,54 @@
                 email: "",
                 password: "",
                 confirmPassword: ""
-            }
+            },
+
+            //登录
+            loginDto: {
+                username: '',
+                password: '',
+                type: 1
+            },
+            //用来登录后展示用户名
+            username: ""
 
         },
 
         methods: {
+
+            //用户登录
+            loginIn() {
+                //参数非空校验
+                if (!this.loginDto.username) {
+                    alert("用户民不能为空");
+                    return;
+                }
+                if (!this.loginDto.password) {
+                    alert("密码不能为空");
+                    return;
+                }
+                this.$http.post("/login/account", this.loginDto)
+                    .then(result => {
+                        result = result.data;
+                        if (result.success) {
+                            alert("登录成功，欢迎使用");
+                            //将信息存到localStorage
+                            localStorage.setItem("token", result.resultObj.token);
+                            localStorage.setItem("loginUser", JSON.stringify(result.resultObj.loginUser));
+                            //登录后需要展示用户的用户名
+                            this.username = result.resultObj.loginUser.username;
+                            //展示登出按钮
+                            $("#loginBefore").hide();
+                            $("#loginAfter").show();
+                            //关闭弹框
+                            $("#popBox").fadeOut();
+                        } else {
+
+                        }
+                    }).catch(result => {
+
+                })
+            },
 
             //创建uuid随机字符串
             createUuid() {
@@ -1098,7 +1160,7 @@
                     return;
                 }
                 //比较两次密码是否一致
-                if (this.sendMessage.password != this.sendMessage.confirmPassword){
+                if (this.sendMessage.password != this.sendMessage.confirmPassword) {
                     alert("两次密码不一致，请重新输入");
                     return;
                 }
@@ -1240,8 +1302,19 @@
                     this.query[key] = value;
                 }
             }
+            debugger;
             this.getCarSearch();
             this.getImg();
+
+            //如果localStorage已经有值，此时应该是登录状态
+            var loginUser = localStorage.getItem("loginUser");
+            if (loginUser){
+                loginUser = JSON.parse(loginUser);
+                this.username = loginUser.username;
+                //展示登出按钮
+                $("#loginBefore").hide();
+                $("#loginAfter").show();
+            }
         }
 
     })
