@@ -162,7 +162,7 @@
                 </span>
                 <span id="loginAfter" style="display: none;">
                     欢迎您：{{username}}！
-                    <a href="#" id="b-logout" class="b-login">登出</a>
+                    <a href="#" id="b-logout" @click="loginOut">登出</a>
                 </span>
             </div>
             <div class="top-l">全国统一客服热线：XXX</div>
@@ -814,8 +814,10 @@
                                 <input class="input left" type="text" v-model="sendMessage.smsCode" value=""
                                        name="verify" placeholder="verification code"
                                        style="width:100px;"/>
-                                <div id="send"><a href="javascript:void(0)" @click="sendMessageCode($event)"
-                                                  class="send_code right">Get code</a></div>
+                                <div id="send">
+                                    <a href="javascript:void(0)" @click="sendMessageCode($event)"
+                                                  class="send_code right">Get code</a>
+                                </div>
                             </li>
                             <li class="clearfix">
                                 <input class="input" type="text" v-model="sendMessage.username" value="" name="realname"
@@ -1023,6 +1025,25 @@
         },
 
         methods: {
+
+            //用户登出
+            loginOut() {
+                this.$http.post("/login/logout")
+                    .then(result => {
+                        result = result.data;
+                        if (result.success) {
+                            alert("登出成功");
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("loginUser");
+                            //展示登录按钮
+                            $("#loginBefore").show();
+                            $("#loginAfter").hide();
+                            location.href = "/index.html";
+                        }
+                    }).catch(result => {
+
+                })
+            },
 
             //用户登录
             loginIn() {
@@ -1302,7 +1323,6 @@
                     this.query[key] = value;
                 }
             }
-            debugger;
             this.getCarSearch();
             this.getImg();
 

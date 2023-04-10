@@ -15,8 +15,8 @@ $(function(){
 			$('.ordercarid').val('');
 		}
 		$('#popBox').fadeIn();
-		$('.p-tab a:first').addClass('on').siblings().removeClass('on');
-		$('.p-dl:first').show().siblings().hide();
+		$('.p-tab .login').addClass('on').siblings().removeClass('on');
+		$('.p-detail .login').show().siblings().hide();
 	})
 	$('#b-tuichu').click(function(){
 		alert('退出成功');
@@ -24,8 +24,18 @@ $(function(){
 	})
 	$('#b-regist').click(function(){
 		$('#popBox').fadeIn();
-		$('.p-tab a:last').addClass('on').siblings().removeClass('on');
-		$('.p-dl:last').show().siblings().hide();
+		$('.p-tab .regist').addClass('on').siblings().removeClass('on');
+		$('.p-detail .regist').show().siblings().hide();
+	})
+	$('#b-phoneLogin').click(function(){
+		$('#popBox').fadeIn();
+		$('.p-tab .phonelogin').addClass('on').siblings().removeClass('on');
+		$('.p-detail .phonelogin').show().siblings().hide();
+	})
+	$('#b-retrievepassword').click(function(){
+		$('#popBox').fadeIn();
+		$('.p-tab .retrievepassword').addClass('on').siblings().removeClass('on');
+		$('.p-detail .retrievepassword').show().siblings().hide();
 	})
 
 	$('#popBox').click(function(){

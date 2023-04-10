@@ -4,7 +4,7 @@ Vue.prototype.$http = axios;
 
 
 // 定义要放行的页面
-var releaseHtmls = ["/index.html"];
+var releaseHtmls = ["/index.html","/exam.html"];
 // 拿到当前要访问的页面路径
 var url = location.href;
 //是否放行
