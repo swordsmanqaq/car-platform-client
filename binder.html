@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信用户绑定</title>
+    <script src="plugins/vue/dist/vue.js"></script>
+    <script src="plugins/axios/dist/axios.js"></script>
+    <script src="script/main.js"></script>
+    <script type="text/javascript" src="script/jquery-1.8.0.min.js"></script>
+    <style>
+        .myDiv{
+            width: 400px;
+            height: 300px;
+            border: 1px solid #5c5c5c;
+            background: darkslategray;
+            margin-top: 150px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        .inputDiv{
+            height: 80px;
+            line-height: 80px;
+            margin-left: 40px;
+        }
+        .inputDiv .input{
+            height: 30px;
+            width: 200px;
+        }
+        .btnInput{
+            height: 30px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body style="background-image: url('images/logo.jpg');background-color: black">
+    <div class="myDiv" id="myDiv">
+        <form class="registForm">
+            <div>
+                <div class="inputDiv">
+                    <input class="input" name="mobile" v-model="bindParam.phone" type="text" value="" placeholder="Input the phone number">
+                </div>
+                <div class="inputDiv">
+                    <input class="input left" type="text" value=""  v-model="bindParam.verifyCode" name="verify" placeholder="Verification code" />
+                    <div id="send" style="display: inline;">
+                       <input class="btnInput" type="button" @click="getSmsCode($event)" value="Get code"/>
+                    </div>
+                </div>
+            </div>
+            <div class="login-button" style="text-align: center">
+                <input type="button" class="btnInput"  value="Binding" class="fM" @click="bind" />
+            </div>
+        </form>
+    </div>
+<script type="text/javascript">
+    new Vue({
+        el:"#myDiv",
+        data:{
+            bindParam:{
+                phone:"",
+                verifyCode:"",
+                accessToken:"",
+                openid:""
+            }
+        },
+        methods:{
+            //绑定获取手机验证码
+            getSmsCode(event){
+                //1.判断手机号不为空
+                if(!this.bindParam.phone){
+                    alert("手机号不能为空");
+                    return;
+                }
+                //2.获取按钮，禁用按钮
+                var sendBtn = $(event.target);
+                sendBtn.attr("disabled",true);
+
+                var param = {
+                    phone: this.bindParam.phone,
+                };
+
+                //4.发送ajax请求
+                this.$http.post("/verification/sms/bind",param).then(res=>{
+                    var ajaxResult = res.data;
+                    if(ajaxResult.success){
+                        alert("手机验证码已经发送到您的手机，请在5分钟内使用");
+                        //4.1.发送成：倒计时
+                        var time = 60;
+
+                        var interval = window.setInterval( function () {
+                            //每一条倒计时减一
+                            time = time - 1 ;
+
+                            //把倒计时时间搞到按钮上
+                            sendBtn.val(time+"秒后重发");
+
+                            //4.2.倒计时完成恢复按钮
+                            if(time <= 0){
+                                sendBtn.val("重新发送");
+                                sendBtn.attr("disabled",false);
+                                //清除定时器
+                                window.clearInterval(interval);
+                            }
+                        },1000);
+                    }else{
+                        //4.3.发送失败：提示，恢复按钮
+                        sendBtn.attr("disabled",false);
+                        alert("发送失败:"+ajaxResult.message);
+                    }
+                })
+            },
+
+            //绑定方法
+            bind(){
+                this.$http.post("/user/bind/wechat",this.bindParam)
+                    .then(result => {
+                        result = result.data;
+                        if(result.success){
+                            // 绑定成功，说明也登录成功
+                            let {token,loginUser} = result.resultObj;
+                            localStorage.setItem("loginUser", JSON.stringify(loginUser));
+                            localStorage.setItem("token", token);
+                            //跳转首页
+                            location.href = "/index.html";
+                        }else{
+                            alert(result.message);
+                        }
+                    })
+            }
+        },
+        mounted(){
+            // 解析url地址中的accessToken，openid
+            let urlObj = splitUrl();
+            this.bindParam.accessToken = urlObj.access_token;
+            this.bindParam.openid = urlObj.openid;
+            console.log(this.bindParam);
+        }
+    })
+</script>
+</body>
+</html>

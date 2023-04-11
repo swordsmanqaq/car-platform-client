@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>回调函数</title>
+    <!--引入vue和Axios.js 先导入vue  再导入axios -->
+    <script src="plugins/vue/dist/vue.js"></script>
+    <script src="plugins/axios/dist/axios.js"></script>
+    <script src="script/main.js"></script>
+</head>
+<body>
+    <div id="callbackDiv">
+
+    </div>
+
+    <script type="text/javascript">
+        new Vue({
+            el: "#callbackDiv",
+            data: {
+
+            },
+            methods: {
+
+            },
+            mounted() {
+                var obj = splitUrl();
+                this.$http.post("/login/wechat/" + obj.code)
+                    .then( result => {
+                        result = result.data;
+                        if (result.success){
+                            var results = result.resultObj;
+                            if (results.success){
+                                localStorage.setItem("token",results.token);
+                                localStorage.setItem("loginUser",JSON.stringify(results.loginUser));
+                                //跳转首页
+                                location.href = "/index.html";
+                            }else {
+                                //没有绑定进行微信绑定
+                                var access_token = results.access_token;
+                                var openid = results.openid;
+                                //跳转到绑定页面
+                                location.href = "/binder.html?access_token=" + access_token + "&openid=" + openid;
+                            }
+                        }else {
+                            alert("网络错误");
+                        }
+                    }).catch( result => {
+                        alert("登录失败");
+                })
+
+            }
+        })
+</script>
+</body>
+</html>

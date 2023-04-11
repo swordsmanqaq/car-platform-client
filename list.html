@@ -1311,18 +1311,12 @@
         },
 
         mounted() {
-            //获取url上的参数
-            var url = location.href;
-            var param = url.split("?")[1];
-            if (param) {
-                var params = param.split("&");
-                for (i = 0; i < params.length; i++) {
-                    var para = params[i];
-                    var key = para.split("=")[0];
-                    var value = para.split("=")[1];
-                    this.query[key] = value;
-                }
+
+            var obj = splitUrl();
+            for (var key in obj){
+                this.query[key] = obj[key];
             }
+
             this.getCarSearch();
             this.getImg();
 
