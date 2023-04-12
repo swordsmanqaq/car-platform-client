@@ -322,7 +322,9 @@
             decrease(row) {
                 this.carNumbers.id = row.id;
                 this.carNumbers.carnumber = row.number - 1;
-                console.log(this.carNumbers);
+                if (this.carNumbers.carnumber == 0){
+                    return;
+                }
                 this.$http.post("/shopingCar/decrease", this.carNumbers)
                     .then(result => {
                         result = result.data;
