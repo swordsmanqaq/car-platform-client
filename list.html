@@ -162,7 +162,9 @@
                 </span>
                 <span id="loginAfter" style="display: none;">
                     欢迎您：{{username}}！
-                    <a href="#" id="b-logout" @click="loginOut">登出</a>
+                    <a href="#" id="b-logout" @click="loginOut">登出</a>｜
+                    <a href="/shoppingCar.html">购物车<span id="carCountSpan" class="number"
+                                                         style="margin-left: 10px;">({{carCount}})</span></a>
                 </span>
             </div>
             <div class="top-l">全国统一客服热线：XXX</div>
@@ -698,6 +700,7 @@
                     <p class="priType-s">
                         <span> <i class="fc-org priType"> {{car.costprice / 10000}}万 </i> </span>
                         <s>{{car.saleprice / 10000}}万</s>
+                        <button class="addShoppingBtn" style="cursor:pointer;" @click="addShppingCar(car)">添加购物车</button>
                     </p>
                 </div>
             </li>
@@ -816,7 +819,7 @@
                                        style="width:100px;"/>
                                 <div id="send">
                                     <a href="javascript:void(0)" @click="sendMessageCode($event)"
-                                                  class="send_code right">Get code</a>
+                                       class="send_code right">Get code</a>
                                 </div>
                             </li>
                             <li class="clearfix">
@@ -1020,11 +1023,70 @@
                 type: 1
             },
             //用来登录后展示用户名
-            username: ""
+            username: "",
 
+            //购物车
+            carCount: null,
+
+            shopingCar:{
+                userId: null,
+                carId: null,
+                number: null,
+                price: null,
+                subtotal: null,
+                shopId: null,
+                state: null
+            }
         },
 
         methods: {
+
+            //查询购物车总条数
+            //获取当前用户购物车信息总数量
+            getShopingCarsTotal() {
+                var logininfoId = localStorage.getItem("loginUser");
+                logininfoId = JSON.parse(logininfoId);
+                this.$http.get("/shopingCar/total/" + logininfoId.id)
+                    .then(result => {
+                        result = result.data;
+                        if (result.success) {
+                            this.carCount = result.resultObj;
+                            console.log(this.carCount);
+                        }
+                    }).catch(result => {
+
+                })
+            },
+
+            //添加购物车
+            addShppingCar(car) {
+                if (this.carCount > 0) {
+                    $("#carCountSpan").show();
+                } else {
+                    $("#carCountSpan").hide();
+                }
+                this.shopingCar.carId = car.id;
+                var logininfo_id = localStorage.getItem("loginUser");
+                logininfo_id = JSON.parse(logininfo_id);
+                this.shopingCar.userId = logininfo_id.id;
+                this.shopingCar.number = 1;
+                this.shopingCar.price = car.costprice;
+                this.shopingCar.subtotal = car.costprice;
+                this.shopingCar.shopId = car.shopId
+                console.log(this.shopingCar);
+                //将添加的车辆信息存入数据库中
+                this.$http.post("/shopingCar/shop_car", this.shopingCar)
+                    .then( result => {
+                        result = result.data;
+                        if (result.success){
+                            this.getShopingCarsTotal();
+                        }else {
+
+                        }
+                    }).catch( result => {
+
+                })
+            },
 
             //用户登出
             loginOut() {
@@ -1313,7 +1375,7 @@
         mounted() {
 
             var obj = splitUrl();
-            for (var key in obj){
+            for (var key in obj) {
                 this.query[key] = obj[key];
             }
 
@@ -1322,13 +1384,14 @@
 
             //如果localStorage已经有值，此时应该是登录状态
             var loginUser = localStorage.getItem("loginUser");
-            if (loginUser){
+            if (loginUser) {
                 loginUser = JSON.parse(loginUser);
                 this.username = loginUser.username;
                 //展示登出按钮
                 $("#loginBefore").hide();
                 $("#loginAfter").show();
             }
+            this.getShopingCarsTotal();
         }
 
     })
